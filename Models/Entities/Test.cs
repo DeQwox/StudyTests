@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudyTests.Models.Entities;
 
-public class Test: Entity
+public class Test : Entity
 {
     [Required]
     public int TeacherID { get; set; }
@@ -19,4 +19,6 @@ public class Test: Entity
 
     [ForeignKey(nameof(TeacherID))]
     public Teacher Teacher { get; set; } = null!;
+
+    public IEnumerable<Question> Questions = [];
 }

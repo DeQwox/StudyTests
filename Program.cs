@@ -25,6 +25,8 @@ try
     if (context.Database.CanConnect())
     {
         Console.WriteLine("✅ Підключення до бази даних успішне!");
+
+        Console.WriteLine(string.Join("\n", context.Tests.Select(i => i.Id)));
     }
     else
     {
