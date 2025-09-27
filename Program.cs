@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Data;
+using StudyTests.Models.Entities;
+using Services;
+using Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 
 // Зчитування конфігурації
 var configuration = new ConfigurationBuilder()
@@ -25,8 +29,6 @@ try
     if (context.Database.CanConnect())
     {
         Console.WriteLine("✅ Підключення до бази даних успішне!");
-
-        Console.WriteLine(string.Join("\n", context.Tests.Select(i => i.Id)));
     }
     else
     {
@@ -37,3 +39,21 @@ catch (Exception ex)
 {
     Console.WriteLine($"❌ Помилка підключення: {ex.Message}");
 }
+
+Testing testing = new(1, 1, new TestingRepository(context));
+
+for (int i = 0; i < testing.GetQuestionsCount(); i++)
+{
+    Question question = testing.GetQuestion();
+    Console.WriteLine(question.Description);
+    Console.WriteLine(string.Join("\n", question.Answers.Select((i, id) => $"{id}: {i}")));
+
+    Console.WriteLine("Answer: ");
+    testing.Answer(Convert.ToInt32(Console.ReadLine()));
+    Console.WriteLine();
+}
+
+context.PassedTests.Add(await testing.GetResult());
+context.SaveChanges();
+
+Console.WriteLine(string.Join(" ", context.PassedTests.Select(i => i.Score)));
