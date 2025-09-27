@@ -58,6 +58,10 @@ namespace StudyTests.Migrations
                     b.Property<int>("CorrectAnswerIndex")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<double>("Score")
                         .HasColumnType("REAL");
 
