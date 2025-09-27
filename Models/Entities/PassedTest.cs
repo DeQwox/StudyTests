@@ -16,4 +16,6 @@ public class PassedTest: Entity
 
     [ForeignKey(nameof(TestId))]
     public Test Test { get; set; } = null!;
+
+    public double Score { get; set; } = 0;
 }

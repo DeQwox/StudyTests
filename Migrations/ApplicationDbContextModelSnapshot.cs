@@ -30,6 +30,9 @@ namespace StudyTests.Migrations
                     b.Property<DateTime>("PassedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<double>("Score")
+                        .HasColumnType("REAL");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("INTEGER");
 
@@ -208,7 +211,7 @@ namespace StudyTests.Migrations
             modelBuilder.Entity("StudyTests.Models.Entities.Question", b =>
                 {
                     b.HasOne("StudyTests.Models.Entities.Test", "Test")
-                        .WithMany()
+                        .WithMany("Questions")
                         .HasForeignKey("TestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -225,6 +228,11 @@ namespace StudyTests.Migrations
                         .IsRequired();
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("StudyTests.Models.Entities.Test", b =>
+                {
+                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }

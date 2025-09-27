@@ -20,5 +20,5 @@ public class Test : Entity
     [ForeignKey(nameof(TeacherID))]
     public Teacher Teacher { get; set; } = null!;
 
-    public IEnumerable<Question> Questions = [];
+    public ICollection<Question> Questions { get; set; }  = [];
 }
