@@ -45,7 +45,7 @@ Testing testing = new(1, 1, new TestingRepository(context));
 for (int i = 0; i < testing.GetQuestionsCount(); i++)
 {
     Question question = testing.GetQuestion();
-    Console.WriteLine(question.Description);
+    Console.WriteLine($"{question.Description}  ({question.Score})");
     Console.WriteLine(string.Join("\n", question.Answers.Select((i, id) => $"{id}: {i}")));
 
     Console.WriteLine("Answer: ");
@@ -53,7 +53,8 @@ for (int i = 0; i < testing.GetQuestionsCount(); i++)
     Console.WriteLine();
 }
 
-context.PassedTests.Add(await testing.GetResult());
+PassedTest passedTest = await testing.GetResult();
+context.PassedTests.Add(passedTest);
 context.SaveChanges();
 
-Console.WriteLine(string.Join(" ", context.PassedTests.Select(i => i.Score)));
+Console.WriteLine($"Score: {passedTest.Score}");
