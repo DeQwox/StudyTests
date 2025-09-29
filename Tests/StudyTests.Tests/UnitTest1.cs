@@ -1,4 +1,5 @@
-﻿
+﻿using Xunit;
+
 namespace StudyTests.Tests;
 
 public class UnitTest1
