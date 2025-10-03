@@ -13,9 +13,13 @@ public class IntegrationTests : IDisposable
 
     public IntegrationTests()
     {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
+        // var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+        //     .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+        //     .Options;
+
+        var a = new DbContextOptionsBuilder<ApplicationDbContext>();
+        var options = a.UseInMemoryDatabase(databaseName: "database_name")
+                        .Options;
 
         _context = new ApplicationDbContext(options);
         _repository = new TestingRepository(_context);
