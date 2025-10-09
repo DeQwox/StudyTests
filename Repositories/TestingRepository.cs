@@ -1,5 +1,6 @@
 using Data;
 using Microsoft.EntityFrameworkCore;
+using Models.DTO;
 using StudyTests.Models.Entities;
 
 namespace Repositories;
@@ -36,6 +37,33 @@ public class TestingRepository(ApplicationDbContext context) : ITestingRepositor
     public IEnumerable<Question> GetTestQuestionList(int id)
     {
         return _context.Questions.Where(i => i.TestId == id);
+    }
+
+    public async Task AddTestAsync(TestCreateViewModel model)
+    {
+        var test = new Test
+        {
+            Name = model.Name,
+            Description = model.Description,
+            Password = model.Password,
+            ValidUntil = model.ValidUntil,
+            TeacherID = model.TeacherId,
+            Questions = model.Questions.Select(q => new Question
+            {
+                Description = q.Description,
+                Answers = q.Answers,
+                CorrectAnswerIndex = q.CorrectAnswerIndex,
+                Score = q.Score
+            }).ToList()
+        };
+
+        await _context.Tests.AddAsync(test);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Teacher>> GetAllTeachersAsync()
+    {
+        return await _context.Teachers.ToListAsync();
     }
 
     // public async Task AddAsync(T entity)
