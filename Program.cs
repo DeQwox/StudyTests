@@ -1,60 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Data;
-using StudyTests.Models.Entities;
-using Services;
 using Repositories;
-using Microsoft.EntityFrameworkCore.Storage;
 
-// Зчитування конфігурації
-var configuration = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json")
-    .Build();
+var builder = WebApplication.CreateBuilder(args);
 
-// Налаштування DbContext для SQLite
-var connectionString = configuration.GetConnectionString("DefaultConnection");
-var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-    .UseSqlite(connectionString)
-    .Options;
+// Add services
+builder.Services.AddControllersWithViews();
 
-// Використання контексту
-using var context = new ApplicationDbContext(options);
+// Add Swagger/OpenAPI generator (so UseSwagger() has the required services)
+builder.Services.AddSwaggerGen();
 
-Console.WriteLine("Підключення до Entity Framework успішне!");
+// Configure DbContext from configuration
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=StudyTests.db";
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(connectionString));
 
-// Перевіряємо чи існує база даних
-try
+// Register repository and services
+builder.Services.AddScoped<ITestingRepository, TestingRepository>();
+builder.Services.AddScoped<IAcountRepository, AcountRepository>();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    if (context.Database.CanConnect())
-    {
-        Console.WriteLine("✅ Підключення до бази даних успішне!");
-    }
-    else
-    {
-        Console.WriteLine("⚠️ Не вдається підключитися до бази даних.");
-    }
+    // In development show detailed errors and enable Swagger UI
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-catch (Exception ex)
+else
 {
-    Console.WriteLine($"❌ Помилка підключення: {ex.Message}");
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
-Testing testing = new(1, 1, new TestingRepository(context));
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
-for (int i = 0; i < testing.GetQuestionsCount(); i++)
-{
-    Question question = testing.GetQuestion();
-    Console.WriteLine($"{question.Description}  ({question.Score})");
-    Console.WriteLine(string.Join("\n", question.Answers.Select((i, id) => $"{id}: {i}")));
+// Додаємо middleware для анти-CSRF
+app.UseAntiforgery();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
-    Console.WriteLine("Answer: ");
-    testing.Answer(Convert.ToInt32(Console.ReadLine()));
-    Console.WriteLine();
-}
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-PassedTest passedTest = await testing.GetResult();
-context.PassedTests.Add(passedTest);
-context.SaveChanges();
-
-Console.WriteLine($"Score: {passedTest.Score}");
+app.Run();
