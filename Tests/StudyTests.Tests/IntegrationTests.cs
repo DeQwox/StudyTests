@@ -3,6 +3,7 @@ using FluentAssertions;
 using Data;
 using StudyTests.Models.Entities;
 using Repositories;
+using Xunit;
 
 namespace StudyTests.Tests;
 

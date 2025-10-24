@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using FluentAssertions;
 using StudyTests.Models.Entities;
+using Xunit;
 
 namespace StudyTests.Tests;
 
