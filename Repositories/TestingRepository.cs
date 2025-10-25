@@ -1,6 +1,6 @@
-using Data;
+using StudyTests.Data;
 using Microsoft.EntityFrameworkCore;
-using Models.DTO;
+using StudyTests.Models.DTO;
 using StudyTests.Models.Entities;
 
 namespace Repositories;

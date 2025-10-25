@@ -1,18 +1,16 @@
-using Data;
-using Models.DTO.Authorization;
+using StudyTests.Data;
+using StudyTests.Models.DTO.Authorization;
 using StudyTests.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace StudyTests.Repositories;
 
-public class AccountRepository : IAccountRepository
+public class AccountRepository(ApplicationDbContext context, UserManager<User> userManager) : IAccountRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public AccountRepository(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly UserManager<User> _userManager = userManager;
 
     public async Task AddStudentAsync(Student student)
     {
@@ -55,13 +53,24 @@ public class AccountRepository : IAccountRepository
         if (loginViewModel.Role == "Student")
         {
             return await _context.Students
-                .FirstOrDefaultAsync(u => u.Login == loginViewModel.UserName && u.Password == loginViewModel.Password);
+                .FirstOrDefaultAsync(u => u.Login == loginViewModel.Login && u.Password == loginViewModel.Password);
         }
         else if (loginViewModel.Role == "Teacher")
         {
             return await _context.Teachers
-                .FirstOrDefaultAsync(u => u.Login == loginViewModel.UserName && u.Password == loginViewModel.Password);
+                .FirstOrDefaultAsync(u => u.Login == loginViewModel.Login && u.Password == loginViewModel.Password);
         }
         return null;
+    }
+
+    public async Task<User?> FindUserByEmailAsync(string email)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task LinkExternalLoginAsync(User localUser, ExternalLoginInfo info)
+    {
+        var login = new UserLoginInfo(info.LoginProvider, info.ProviderKey, info.ProviderDisplayName);
+        await _userManager.AddLoginAsync(localUser, login);
     }
 }

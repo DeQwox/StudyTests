@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FluentAssertions;
-using Data;
+using StudyTests.Data;
 using StudyTests.Models.Entities;
 using Repositories;
 using Xunit;

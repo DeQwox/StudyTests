@@ -11,7 +11,18 @@
 <body>
     <div class="container">
         <header>
-            <h1>StudyTests</h1>
+            <a asp-controller="Home" asp-action="Index">StudyTests</a>
+
+            <nav>
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-secondary">Вийти (@User.Identity.Name)</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Увійти</a>
+                }
+            </nav>
         </header>
         <main role="main">
             @RenderBody()

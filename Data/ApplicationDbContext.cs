@@ -1,20 +1,19 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StudyTests.Models.Entities;
 
-namespace Data;
+namespace StudyTests.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User, IdentityRole<int>, int>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
-
     public DbSet<Student> Students { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<PassedTest> PassedTests { get; set; }
     public DbSet<Test> Tests { get; set; }
     public DbSet<Question> Questions { get; set; }
-    // Configure conversions for types EF doesn't map by default
+    
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

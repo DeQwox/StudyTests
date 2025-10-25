@@ -1,66 +1,89 @@
 using Microsoft.AspNetCore.Mvc;
-using Models.DTO.Authorization;
-using StudyTests.Repositories;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using StudyTests.Data;
+using StudyTests.Models.Entities;
+using System.Security.Claims;
+using StudyTests.Models.DTO.Authorization;
+using BCrypt;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace StudyTests.Controllers;
 
-public class AccountController(IAccountRepository accountRepository) : Controller
+public class AccountController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager) : Controller
 {
-    private readonly IAccountRepository _accountRepository = accountRepository;
+    private readonly ApplicationDbContext _context = context;
+    private readonly UserManager<User> _userManager = userManager;
+    private readonly SignInManager<User> _signInManager = signInManager;
 
     [HttpGet]
-    [Route("register")]
-    public IActionResult Register()
-    {
-        return View();
-    }
+    public IActionResult Register() => View();
+
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Route("RegistrationUser")]
-    public async Task<IActionResult> RegistrationUser(RegisterViewModel model)
+    public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid)
             return View(model);
 
-        try
+        var user = new User
         {
-            await _accountRepository.AddUserAsync(model);
-        }
-        catch (Exception ex)
+            UserName = model.Login,
+            Email = model.Email,
+            PhoneNumber = model.PhoneNumber,
+            FirstName = model.FirstName,
+            LastName = model.LastName
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, "Не вдалося створити користувача: " + ex.Message);
-            return View(model);
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("Profile");
         }
 
-        return RedirectToAction("Login");
+        foreach (var error in result.Errors)
+            ModelState.AddModelError("", error.Description);
+
+        return View(model);
     }
+
     [HttpGet]
-    [Route("login")]
-    public IActionResult Login()
-    {
-        // Implementation for retrieving a student by ID
-        return View();
-    }
+    public IActionResult Login() => View();
+
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Route("LoginUser")]
-    public async Task<IActionResult> LoginUser(LoginViewModel model)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (!ModelState.IsValid)
             return View(model);
 
-        var user = await _accountRepository.LoginUserAsync(model);
-        if (user == null)
-        {
-            ModelState.AddModelError(string.Empty, "Невірне ім'я користувача або пароль.");
-            return View(model);
-        }
+        var result = await _signInManager.PasswordSignInAsync(model.Login!, model.Password!, false, false);
+        if (result.Succeeded)
+            return RedirectToAction("Profile");
 
-        // Here you would typically sign in the user using ASP.NET Core Identity or similar
-        // For example:
-        // await HttpContext.SignInAsync(...);
+        ModelState.AddModelError("", "Invalid login or password");
+        return View(model);
+    }
 
+    [HttpGet]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
-    
+
+    [HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        if (!User.Identity!.IsAuthenticated)
+            return RedirectToAction("Login");
+
+        var user = await _userManager.GetUserAsync(User);
+        return View(user);
+    }
+
+    public IActionResult AccessDenied() => View();
 }
+

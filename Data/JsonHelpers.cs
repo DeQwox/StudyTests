@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Data;
+namespace StudyTests.Data;
 
 public static class JsonHelpers
 {

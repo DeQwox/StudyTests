@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Models.DTO;
+using StudyTests.Models.DTO;
 using Repositories;
 using StudyTests.Models.Entities;
 

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using StudyTests.Models.Entities;
 
-namespace Models.DTO
+namespace StudyTests.Models.DTO
 {
     public class TestCreateViewModel
     {

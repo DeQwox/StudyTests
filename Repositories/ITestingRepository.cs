@@ -1,5 +1,5 @@
 using StudyTests.Models.Entities;
-using Models.DTO;
+using StudyTests.Models.DTO;
 
 namespace Repositories;
 
