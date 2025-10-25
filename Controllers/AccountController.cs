@@ -1,18 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Models.DTO.Authorization;
-using Repositories;
-// If IAccountRepository is in a different namespace, add the correct using below
-// using YourProject.Repositories;
+using StudyTests.Repositories;
 
 namespace StudyTests.Controllers;
 
-public class AcountController : Controller
+public class AccountController(IAccountRepository accountRepository) : Controller
 {
-    private readonly IAcountRepository _accountRepository;
-    public AcountController(IAcountRepository accountRepository)
-    {
-        _accountRepository = accountRepository;
-    }
+    private readonly IAccountRepository _accountRepository = accountRepository;
+
     [HttpGet]
     [Route("register")]
     public IActionResult Register()

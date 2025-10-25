@@ -1,0 +1,9 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Error";
+}
+<h1>An error occurred</h1>
+<p>Sorry — an error happened while processing your request.</p>
+<pre>
+    @* @Context?.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()?.Error?.ToString() *@
+</pre>

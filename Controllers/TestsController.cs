@@ -5,14 +5,9 @@ using StudyTests.Models.Entities;
 
 namespace StudyTests.Controllers;
 
-public class TestsController : Controller
+public class TestsController(ITestingRepository repo) : Controller
 {
-    private readonly ITestingRepository _repo;
-
-    public TestsController(ITestingRepository repo)
-    {
-        _repo = repo;
-    }
+    private readonly ITestingRepository _repo = repo;
 
     [HttpGet]
     [Route("CreateTest")]

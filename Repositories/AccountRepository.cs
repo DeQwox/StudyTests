@@ -3,13 +3,13 @@ using Models.DTO.Authorization;
 using StudyTests.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories;
+namespace StudyTests.Repositories;
 
-public class AcountRepository : IAcountRepository
+public class AccountRepository : IAccountRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public AcountRepository(ApplicationDbContext context)
+    public AccountRepository(ApplicationDbContext context)
     {
         _context = context;
     }

@@ -1,9 +1,9 @@
 using StudyTests.Models.Entities;
 using Models.DTO.Authorization;
 
-namespace Repositories;
+namespace StudyTests.Repositories;
 
-public interface IAcountRepository
+public interface IAccountRepository
 {
     Task AddStudentAsync(Student student);
     Task AddUserAsync(RegisterViewModel model);

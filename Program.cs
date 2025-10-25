@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Data;
 using Repositories;
+using StudyTests.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Register repository and services
 builder.Services.AddScoped<ITestingRepository, TestingRepository>();
-builder.Services.AddScoped<IAcountRepository, AcountRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 var app = builder.Build();
 
