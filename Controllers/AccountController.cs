@@ -32,8 +32,7 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
             UserName = model.Login,
             Email = model.Email,
             PhoneNumber = model.PhoneNumber,
-            FirstName = model.FirstName,
-            LastName = model.LastName
+            FullName = model.FullName,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -85,5 +84,19 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
     }
 
     public IActionResult AccessDenied() => View();
+
+    [HttpGet]
+    public IActionResult ExternalLogin(string provider = "oidc", string returnUrl = "/")
+    {
+        var redirectUrl = Url.Action("Index", "Home", new { returnUrl });
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        return Challenge(properties, provider);
+    }
+
+    [HttpGet]
+    public IActionResult ExternalLoginCallback()
+    {
+        return RedirectToAction("Index", "Home");
+    }
 }
 

@@ -66,8 +66,7 @@ public class EntityModelTests
         {
             Id = 1,
             Login = "johndoe",
-            FirstName = "John",
-            LastName = "Doe",
+            FullName = "John Doe",
             Email = "john.doe@example.com"
         };
 
@@ -75,8 +74,7 @@ public class EntityModelTests
         student.Should().BeAssignableTo<User>();
         student.Id.Should().Be(1);
         student.Login.Should().Be("johndoe");
-        student.FirstName.Should().Be("John");
-        student.LastName.Should().Be("Doe");
+        student.FullName.Should().Be("John Doe");
         student.Email.Should().Be("john.doe@example.com");
     }
 
@@ -88,8 +86,7 @@ public class EntityModelTests
         {
             Id = 1,
             Login = "janesmith",
-            FirstName = "Jane", 
-            LastName = "Smith",
+            FullName = "Jane Smith",
             Email = "jane.smith@example.com"
         };
 
@@ -97,8 +94,7 @@ public class EntityModelTests
         teacher.Should().BeAssignableTo<User>();
         teacher.Id.Should().Be(1);
         teacher.Login.Should().Be("janesmith");
-        teacher.FirstName.Should().Be("Jane");
-        teacher.LastName.Should().Be("Smith");
+        teacher.FullName.Should().Be("Jane Smith");
         teacher.Email.Should().Be("jane.smith@example.com");
     }
 
@@ -110,8 +106,7 @@ public class EntityModelTests
         {
             Id = 1,
             Login = "testStudent",
-            FirstName = "Test",
-            LastName = "Student",
+            FullName = "Test Student",
             Email = "test@example.com"
         };
 
@@ -151,8 +146,7 @@ public class EntityModelTests
         {
             Id = 1,
             Login = "testuser",
-            FirstName = "Test",
-            LastName = "User",
+            FullName = "Test User",
             Email = "test.user@example.com"
         };
 
@@ -160,8 +154,7 @@ public class EntityModelTests
         user.Should().BeAssignableTo<Entity>();
         user.Id.Should().Be(1);
         user.Login.Should().Be("testuser");
-        user.FirstName.Should().Be("Test");
-        user.LastName.Should().Be("User");
+        user.FullName.Should().Be("Test User");
         user.Email.Should().Be("test.user@example.com");
     }
 
@@ -176,8 +169,7 @@ public class EntityModelTests
         var user = new User
         {
             Login = "testuser",
-            FirstName = "Test",
-            LastName = "User",
+            FullName = "Test User",
             Email = invalidEmail
         };
 

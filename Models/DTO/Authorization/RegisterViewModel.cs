@@ -8,13 +8,9 @@ public class RegisterViewModel : IValidatableObject
     [StringLength(50, ErrorMessage = "Максимум 50 символів")]
     public string Login { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Введіть ім'я")]
+    [Required(ErrorMessage = "Введіть прізвище ім'я")]
     [StringLength(500, ErrorMessage = "Максимум 500 символів")]
-    public string FirstName { get; set; } = string.Empty;
-    
-    [Required(ErrorMessage = "Введіть прізвище")]
-    [StringLength(500, ErrorMessage = "Максимум 500 символів")]
-    public string LastName { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Введіть email")]
     [EmailAddress(ErrorMessage = "Невірний формат email")]

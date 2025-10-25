@@ -32,7 +32,7 @@
             {
                 foreach (var t in (IEnumerable<StudyTests.Models.Entities.Teacher>)ViewBag.Teachers)
                 {
-                    <option value="@t.Id">@t.FirstName @t.LastName (@t.Login)</option>
+                    <option value="@t.Id">@t.FullName (@t.Login)</option>
                 }
             }
         </select>

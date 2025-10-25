@@ -25,8 +25,7 @@ public class AccountRepository(ApplicationDbContext context, UserManager<User> u
             var student = new Student
             {
                 Login = model.Login,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
+                FullName = model.FullName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Password = model.Password
@@ -38,8 +37,7 @@ public class AccountRepository(ApplicationDbContext context, UserManager<User> u
             var teacher = new Teacher
             {
                 Login = model.Login,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
+                FullName = model.FullName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
                 Password = model.Password

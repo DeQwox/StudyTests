@@ -65,8 +65,7 @@ public class IntegrationTests : IDisposable
 
         // Assert
         student.Should().NotBeNull();
-        student!.FirstName.Should().Be("John");
-        student.LastName.Should().Be("Doe");
+        student!.FullName.Should().Be("John Doe");
         student.Email.Should().Be("john.doe@example.com");
     }
 
@@ -88,8 +87,7 @@ public class IntegrationTests : IDisposable
 
         // Assert
         teacher.Should().NotBeNull();
-        teacher!.FirstName.Should().Be("Jane");
-        teacher.LastName.Should().Be("Smith");
+        teacher!.FullName.Should().Be("Jane Smith");
         teacher.Email.Should().Be("jane.smith@example.com");
     }
 
@@ -142,8 +140,7 @@ public class IntegrationTests : IDisposable
         var teacher = new Teacher
         {
             Login = "janesmith",
-            FirstName = "Jane",
-            LastName = "Smith",
+            FullName = "Jane Smith",
             Email = "jane.smith@example.com"
         };
         _context.Teachers.Add(teacher);
@@ -152,8 +149,7 @@ public class IntegrationTests : IDisposable
         var student = new Student
         {
             Login = "johndoe",
-            FirstName = "John",
-            LastName = "Doe",
+            FullName = "John Doe",
             Email = "john.doe@example.com"
         };
         _context.Students.Add(student);
