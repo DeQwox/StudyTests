@@ -1,0 +1,35 @@
+@model IEnumerable<StudyTests.Models.Entities.Test>
+@{
+    ViewData["Title"] = "Список тестів";
+}
+
+<div class="container">
+    <h2 class="mb-4">Список тестів</h2>
+
+    @if (!Model.Any())
+    {
+        <p>Тести ще не створені.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var test in Model)
+            {
+                <div class="col-12 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@test.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Вчитель: @test.Teacher.FullName</h6>
+                            <p class="card-text">
+                                @(test.Description.Length > 200 ? test.Description.Substring(0, 200) + "..." : test.Description)
+                            </p>
+                            <p class="card-text">
+                                <strong>Максимальний бал:</strong> @(test.Questions?.Sum(q => q.Score) ?? 0)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

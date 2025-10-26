@@ -14,8 +14,7 @@ namespace StudyTests.Models.DTO
 
         public DateTime? ValidUntil { get; set; }
 
-        [Required]
-        public string Password { get; set; } = string.Empty;
+        public string? Password { get; set; }
 
         [Required]
         public int TeacherId { get; set; }

@@ -12,7 +12,7 @@ public class PassedTest: Entity
     public List<string> Answers { get; set; } = new List<string>();
 
     [ForeignKey(nameof(StudentId))]
-    public Student Student { get; set; } = null!;
+    public User Student { get; set; } = null!;
 
     [ForeignKey(nameof(TestId))]
     public Test Test { get; set; } = null!;

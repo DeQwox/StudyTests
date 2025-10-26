@@ -11,7 +11,9 @@ public class TestingRepository(ApplicationDbContext context) : ITestingRepositor
 
     public async Task<IEnumerable<Test>> GetAllTestsAsync()
     {
-        return await _context.Tests.ToListAsync();
+        return await _context.Tests
+            .Include(t => t.Questions)
+            .ToListAsync();
     }
 
     public async Task<Test?> GetTestByIdAsync(int id)
