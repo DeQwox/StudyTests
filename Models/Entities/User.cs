@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace StudyTests.Models.Entities;
 
-[Index(nameof(Login), IsUnique = true)]
 [Index(nameof(Email), IsUnique = true)]
 [Index(nameof(PhoneNumber), IsUnique = true)]
 public class User : IdentityUser<int>

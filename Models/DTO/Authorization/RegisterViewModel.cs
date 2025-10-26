@@ -29,7 +29,8 @@ public class RegisterViewModel : IValidatableObject
     [Required(ErrorMessage = "Підтвердіть пароль")]
     [Compare("Password", ErrorMessage = "Паролі не співпадають")]
     public string ConfirmPassword { get; set; } = string.Empty;
-    
+
+    [Required]    
     public string Role { get; set; } = "Student";
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -16,7 +16,7 @@
             <nav>
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-secondary">Вийти (@User.Identity.Name)</a>
+                    <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-secondary">Профіль (@User.Identity.Name)</a>
                 }
                 else
                 {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Repositories;
 using StudyTests.Models.Entities;
 
-namespace Services;
+namespace StudyTests.Services;
 
 public class Testing
 {

@@ -33,12 +33,19 @@ public static class Config
         ];
 
     public static List<TestUser> Users =>
-        [
-            new TestUser
-            {
-                SubjectId = "1",
-                Username = "kikono",
-                Password = "password"
-            }
-        ];
+    [
+        new TestUser
+        {
+            SubjectId = "1",
+            Username = "kikono",
+            Password = "password",
+            Claims =
+            [
+                new System.Security.Claims.Claim("sub", "1"),
+                new System.Security.Claims.Claim("name", "Kikono Test"),
+                new System.Security.Claims.Claim("email", "kikono@example.com"),
+                new System.Security.Claims.Claim("phone", "+380999999999"),
+            ]
+        }
+    ];
 }

@@ -39,27 +39,57 @@ public class IdentityServerAccountController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var user = Config.Users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
-        if (user == null)
+        var testUser = Config.Users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
+        if (testUser == null)
         {
             ModelState.AddModelError("", "Invalid username or password");
             return View(model);
         }
 
-        var appUser = await _userManager.FindByNameAsync(user.Username);
+        var email = testUser.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+
+        var appUser = await _userManager.FindByEmailAsync(email!);
         if (appUser == null)
         {
-            appUser = new User { UserName = user.Username };
-            await _userManager.CreateAsync(appUser);
+            var name = testUser.Claims.FirstOrDefault(c => c.Type == "name")?.Value!;
+            var phone = testUser.Claims.FirstOrDefault(c => c.Type == "phone")?.Value;
+            appUser = new User { 
+                UserName = testUser.Username,
+                FullName = name,
+                Email = email,
+                PhoneNumber = phone,
+                Password = testUser.Password
+            };
+            var createResult = await _userManager.CreateAsync(appUser);
+            if (!createResult.Succeeded)
+            {
+                Console.WriteLine(string.Join("\n", createResult.Errors.Select(i => i.Description)));
+                ModelState.AddModelError("", "Failed to create user");
+                return View(model);
+            }
+        }
+
+        if (!await _userManager.IsInRoleAsync(appUser, "Student"))
+        {
+            var roleResult = await _userManager.AddToRoleAsync(appUser, "Student");
+            if (!roleResult.Succeeded)
+            {
+                ModelState.AddModelError("", "Failed to assign role");
+                return View(model);
+            }
         }
 
         await _signInManager.SignInAsync(appUser, isPersistent: false);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim("sub", user.SubjectId),
-            new Claim("name", user.Username)
+            new("sub", testUser.SubjectId),
+            new("name", testUser.Username),
+            new(ClaimTypes.Role, "Student")
         };
+
+        claims.AddRange(testUser.Claims);
+
         var identity = new ClaimsIdentity(claims, IdentityServerConstants.DefaultCookieAuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         await HttpContext.SignInAsync(IdentityServerConstants.DefaultCookieAuthenticationScheme, principal);
