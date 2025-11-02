@@ -7,7 +7,6 @@ using System.Security.Claims;
 using StudyTests.Models.DTO.Authorization;
 using BCrypt;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
 using Duende.IdentityServer;
 
 namespace StudyTests.Controllers;
@@ -138,4 +137,3 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
         return View("Index");
     }
 }
-
