@@ -15,6 +15,8 @@ using StudyTests.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSession();
+
 // Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
@@ -103,6 +105,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseSession();
 
 // Create roles
 using (var scope = app.Services.CreateScope())

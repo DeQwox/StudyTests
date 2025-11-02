@@ -1,4 +1,5 @@
-@model IEnumerable<StudyTests.Models.Entities.Test>
+@using StudyTests.Models.DTO.Tests
+@model IEnumerable<TestViewModel>
 @{
     ViewData["Title"] = "Список тестів";
 }
@@ -13,21 +14,50 @@
     else
     {
         <div class="row">
-            @foreach (var test in Model)
+            @foreach (var item in Model)
             {
-                <div class="col-12 mb-3">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">@test.Name</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Вчитель: @test.Teacher.FullName</h6>
-                            <p class="card-text">
-                                @(test.Description.Length > 200 ? test.Description.Substring(0, 200) + "..." : test.Description)
-                            </p>
-                            <p class="card-text">
-                                <strong>Максимальний бал:</strong> @(test.Questions?.Sum(q => q.Score) ?? 0)
-                            </p>
+                var test = item.Test;
+                var passed = item.Passed;
+                var maxScore = test.Questions?.Sum(q => q.Score) ?? 0;
+
+                <div class="col-12 col-md-6 mb-3">
+                    <a asp-controller="Tests" asp-action="Details" asp-route-id="@test.Id"
+                       class="text-decoration-none text-reset">
+                        <div class="card shadow-sm h-100 position-relative hover-shadow"
+                             style="cursor: pointer; transition: transform .1s ease-in-out;"
+                             onmouseover="this.style.transform='scale(1.02)'"
+                             onmouseout="this.style.transform='scale(1)'">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">@test.Name</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">Вчитель: @test.Teacher.FullName</h6>
+                                    </div>
+                                    @if (passed != null)
+                                    {
+                                        <span class="badge bg-success">Пройдено</span>
+                                    }
+                                </div>
+
+                                <p class="card-text mt-2">
+                                    @(test.Description.Length > 200 ? test.Description.Substring(0, 200) + "..." : test.Description)
+                                </p>
+
+                                <p class="card-text">
+                                    @if (passed != null)
+                                    {
+                                        <strong>Результат:</strong>
+                                        @($" {passed.Score} / {maxScore}")
+                                    }
+                                    else
+                                    {
+                                        <strong>Оцінюється на:</strong>
+                                        @($" {maxScore}")
+                                    }
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>

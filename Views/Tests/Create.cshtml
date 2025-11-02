@@ -1,4 +1,4 @@
-@model StudyTests.Models.DTO.TestCreateViewModel
+@model StudyTests.Models.DTO.Tests.TestCreateViewModel
 @{
     ViewData["Title"] = "Створити тест";
 }
@@ -28,20 +28,7 @@
         <span asp-validation-for="ValidUntil" class="text-danger"></span>
         <span asp-validation-for="ValidUntil" class="text-danger"></span>
     </div>
-    <div class="mb-3">
-        <label asp-for="TeacherId" class="form-label">Вчитель</label>
-        <select asp-for="TeacherId" class="form-select">
-            <option value="">Оберіть вчителя</option>
-            @if (ViewBag.Teachers != null)
-            {
-                foreach (var t in (IEnumerable<StudyTests.Models.Entities.User>)ViewBag.Teachers)
-                {
-                    <option value="@t.Id">@t.FullName (@t.UserName)</option>
-                }
-            }
-        </select>
-        <span asp-validation-for="TeacherId" class="text-danger"></span>
-    </div>
+    
 
     <h4>Питання</h4>
     <div id="questions"></div>
@@ -93,7 +80,7 @@
     <div class="mb-2 answers">
         <label>Варіанти відповіді (виділіть правильну)</label>
         <div class="d-flex align-items-center gap-2 mt-1">
-            <input type="radio" name="correct_${qIndex}" class="form-check-input" />
+            <input type="radio" name="correct_${qIndex}" class="form-check-input a-correct" />
             <input class="form-control a-text" placeholder="Введіть відповідь" />
         </div>
     </div>
@@ -108,7 +95,7 @@
             $('#questions').on('click', '.add-answer', function(){
                 const container = $(this).closest('.card').find('.answers');
                 const qidx = $(this).closest('.card').data('index');
-                container.append(`<div class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="correct_${qidx}" class="form-check-input" /> <input class="form-control a-text" placeholder="Введіть відповідь" /></div>`);
+                container.append(`<div class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="correct_${qidx}" class="form-check-input a-correct" /> <input class="form-control a-text" placeholder="Введіть відповідь" /></div>`);
             });
 
             $('#questions').on('click', '.remove-question', function(){
@@ -121,7 +108,7 @@
                     const qText = $(this).find('.q-text').val();
                     const scoreVal = parseFloat($(this).find('.q-score').val()) || 0;
                     const answers = [];
-                    let correctIndex = 0;
+                    let correctIndex = -1;
                     $(this).find('.answers div').each(function(ai){
                         answers.push($(this).find('.a-text').val());
                         if ($(this).find('.a-correct').is(':checked')) correctIndex = ai;
