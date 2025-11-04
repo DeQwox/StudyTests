@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyTests.Models.DTO;
 using Repositories;
-using StudyTests.Models.Entities;
 
 namespace StudyTests.Controllers;
 
@@ -30,5 +29,19 @@ public class TestsController(ITestingRepository repo) : Controller
 
         }
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpGet("tests/old/{id:int}")]
+    public IActionResult Old(int id)
+    {
+        ViewBag.TestId = id;
+        return View("OldDetails");
+    }
+
+    [HttpGet("tests/new/{id:int}")]
+    public IActionResult New(int id)
+    {
+        ViewBag.TestId = id;
+        return View("NewDetails");
     }
 }

@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Test Details (Old UI)";
+    var testId = (int)ViewBag.TestId;
+}
+<div class="container mt-4">
+    <h2>Деталі тесту (Старий сумісний інтерфейс)</h2>
+    <p>Показуємо лише поля старого інтерфейсу, але дані беремо з останнього API (v2).</p>
+    <div id="old-details" class="mt-3">
+        <div><strong>Id:</strong> <span id="old-id"></span></div>
+        <div><strong>Name:</strong> <span id="old-name"></span></div>
+        <div><strong>Description:</strong> <span id="old-desc"></span></div>
+    </div>
+</div>
+<script>
+(async function(){
+  try {
+    const id = @testId;
+    const res = await fetch(`/api/v2/tests/${id}`);
+    if(!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    // Старий UI використовує тільки підмножину полів (v1): id, name, description
+    document.getElementById('old-id').textContent = data.id;
+    document.getElementById('old-name').textContent = data.name;
+    document.getElementById('old-desc').textContent = data.description;
+  } catch(e){
+    console.error(e);
+  }
+})();
+</script>
