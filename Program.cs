@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using StudyTests.Data;
 using Repositories;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<ILookupNormalizer, NoOpNormalizer>();
 // Add ASP.NET Identity
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
+    // Default (production) policy
     options.Password.RequireDigit = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
@@ -44,6 +46,15 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 
     options.SignIn.RequireConfirmedAccount = false;
+
+    // Relax password requirements in Development to make manual testing via Swagger easier
+    if (builder.Environment.IsDevelopment())
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 4;
+    }
 })
 .AddRoles<IdentityRole<int>>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -101,8 +112,43 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.AddAuthorization();
 
-var app = builder.Build();
+// Register API services
+builder.Services.AddScoped<StudyTests.Services.Api.ITestsCrudService, StudyTests.Services.Api.TestsCrudService>();
+builder.Services.AddScoped<StudyTests.Services.Api.IQuestionsService, StudyTests.Services.Api.QuestionsService>();
+builder.Services.AddScoped<StudyTests.Services.Api.IPassedTestsService, StudyTests.Services.Api.PassedTestsService>();
+builder.Services.AddScoped<StudyTests.Services.Api.IUsersService, StudyTests.Services.Api.UsersService>();
 
+var app = builder.Build();
+// Ensure SQLite is configured for WAL and a reasonable busy timeout to reduce 'database is locked' errors
+// Apply PRAGMA to each configured connection string that looks like a file-based SQLite DB.
+var connSection = builder.Configuration.GetSection("ConnectionStrings");
+foreach (var conn in connSection.GetChildren())
+{
+    var connValue = conn.Value;
+    if (string.IsNullOrWhiteSpace(connValue)) continue;
+    // Only attempt PRAGMA on connection strings that contain a Data Source (file-based SQLite)
+    if (!connValue.Contains("Data Source", StringComparison.OrdinalIgnoreCase)) continue;
+
+    try
+    {
+        await using var sqliteConn = new SqliteConnection(connValue);
+        await sqliteConn.OpenAsync();
+        await using var cmd = sqliteConn.CreateCommand();
+        // Enable WAL journal mode for better concurrency
+        cmd.CommandText = "PRAGMA journal_mode=WAL;";
+        await cmd.ExecuteNonQueryAsync();
+        // Set busy timeout (milliseconds) so SQLite will wait briefly when DB is locked
+        cmd.CommandText = "PRAGMA busy_timeout = 5000;";
+        await cmd.ExecuteNonQueryAsync();
+        await sqliteConn.CloseAsync();
+    }
+    catch (Exception ex)
+    {
+        // Log but don't fail startup if PRAGMA can't be set (e.g., running on non-file-based provider or unsupported keywords)
+        var tmpLoggerFactory = LoggerFactory.Create(l => l.AddConsole());
+        tmpLoggerFactory.CreateLogger("Program").LogWarning(ex, "Could not set PRAGMA for connection '{ConnName}'. Continuing.", conn.Key);
+    }
+}
 
 // Create roles
 using (var scope = app.Services.CreateScope())
@@ -111,7 +157,9 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        var userManager = services.GetRequiredService<UserManager<User>>();
         await SeedRolesAsync(roleManager);
+        await SeedInitialUsersAsync(userManager, roleManager);
     }
     catch (Exception ex)
     {
@@ -163,4 +211,42 @@ static async Task SeedRolesAsync(RoleManager<IdentityRole<int>> roleManager)
             await roleManager.CreateAsync(role);
         }
     }
+}
+
+static async Task SeedInitialUsersAsync(UserManager<User> userManager, RoleManager<IdentityRole<int>> roleManager)
+{
+    // Create an initial teacher account for local testing if it doesn't exist
+    var teacherLogin = "teacher";
+    var teacherEmail = "teacher@example.local";
+    var teacher = await userManager.FindByNameAsync(teacherLogin) ?? await userManager.FindByEmailAsync(teacherEmail);
+    if (teacher is not null) return;
+
+    var newTeacher = new User
+    {
+        UserName = teacherLogin,
+        Login = teacherLogin,
+        FullName = "Initial Teacher",
+        Email = teacherEmail,
+        PhoneNumber = "+380501234567"
+    };
+
+    var pwd = "P@ssW0rd1!"; // meets Identity password requirements configured in Program.cs
+    var createResult = await userManager.CreateAsync(newTeacher, pwd);
+    if (!createResult.Succeeded)
+    {
+        // Log or ignore in dev; we won't throw to avoid breaking startup
+        return;
+    }
+
+    // Ensure role exists and add user to role
+    var roleName = "Teacher";
+    if (!await roleManager.RoleExistsAsync(roleName))
+    {
+        await roleManager.CreateAsync(new IdentityRole<int> { Name = roleName, NormalizedName = roleName.ToUpper() });
+    }
+    await userManager.AddToRoleAsync(newTeacher, roleName);
+
+    // Confirm email so the account is active for sign-in flows that require confirmation
+    var token = await userManager.GenerateEmailConfirmationTokenAsync(newTeacher);
+    await userManager.ConfirmEmailAsync(newTeacher, token);
 }
