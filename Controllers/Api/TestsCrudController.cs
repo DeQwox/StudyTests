@@ -25,6 +25,8 @@ public class TestsCrudController(ITestsCrudService service) : ControllerBase
     public async Task<ActionResult<TestReadDto>> Create([FromBody] TestDto dto)
     {
         var created = await _service.CreateAsync(dto);
+        if (created == null)
+            return BadRequest(new { error = "Teacher not found or user is not in 'Teacher' role" });
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

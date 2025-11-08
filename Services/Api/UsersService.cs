@@ -113,8 +113,19 @@ public class UsersService(
                 }
             }
 
-            var currentRoles = await userManager.GetRolesAsync(user);
-            // Remove roles that are not the newRole
+            var currentRoles = (await userManager.GetRolesAsync(user)).ToArray();
+
+            // Add new role first if missing
+            if (!currentRoles.Contains(newRole, StringComparer.OrdinalIgnoreCase))
+            {
+                var added = await userManager.AddToRoleAsync(user, newRole);
+                if (!added.Succeeded)
+                {
+                    return (false, added.Errors.Select(e => e.Description));
+                }
+            }
+
+            // Remove other roles
             var toRemove = currentRoles.Where(r => !string.Equals(r, newRole, StringComparison.OrdinalIgnoreCase)).ToArray();
             if (toRemove.Length > 0)
             {
@@ -122,15 +133,6 @@ public class UsersService(
                 if (!removed.Succeeded)
                 {
                     return (false, removed.Errors.Select(e => e.Description));
-                }
-            }
-
-            if (!currentRoles.Contains(newRole, StringComparer.OrdinalIgnoreCase))
-            {
-                var added = await userManager.AddToRoleAsync(user, newRole);
-                if (!added.Succeeded)
-                {
-                    return (false, added.Errors.Select(e => e.Description));
                 }
             }
         }
