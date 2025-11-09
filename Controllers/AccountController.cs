@@ -8,6 +8,7 @@ using StudyTests.Models.DTO.Authorization;
 using BCrypt;
 using Microsoft.AspNetCore.Identity;
 using Duende.IdentityServer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StudyTests.Controllers;
 
@@ -68,6 +69,7 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
@@ -79,6 +81,7 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Profile()
     {
         if (!User.Identity!.IsAuthenticated)
@@ -115,6 +118,7 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize]
     public async Task<IActionResult> DeleteAccount()
     {
         var user = await _userManager.GetUserAsync(User);

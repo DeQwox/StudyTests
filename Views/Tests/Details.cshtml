@@ -1,0 +1,71 @@
+@using Microsoft.AspNetCore.Identity
+@using StudyTests.Models.Entities
+@model Test
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="card-title">@Model.Name</h3>
+                @if (ViewBag.Passed != null)
+                {
+                    <span class="badge bg-success fs-6">Пройдено</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary fs-6">Не пройдено</span>
+                }
+            </div>
+
+            <h6 class="text-muted">Вчитель: @Model.Teacher.FullName</h6>
+            <p class="mt-3">@Model.Description</p>
+
+            <p class="mb-1"><strong>Кількість запитань:</strong> @Model.Questions.Count</p>
+
+            @{
+                var maxScore = Model.Questions?.Sum(q => q.Score) ?? 0;
+            }
+
+            @if (ViewBag.Passed != null)
+            {
+                <p><strong>Ваш результат:</strong> @ViewBag.Passed.Score / @maxScore</p>
+                <p class="text-muted">Дата проходження: @ViewBag.Passed.PassedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+            }
+            else
+            {
+                <p><strong>Максимальний бал:</strong> @maxScore</p>
+            }
+
+            <hr />
+
+            @if (User?.Identity is { IsAuthenticated: true })
+            {
+                @if (ViewBag.Passed == null)
+                {
+                    <a asp-controller="Testing" asp-action="Start" asp-route-id="@Model.Id" class="btn btn-primary">Почати тест</a>
+                }
+                else
+                {
+                    <a asp-controller="Testing" asp-action="Result" asp-route-id="@ViewBag.Passed.Id" class="btn btn-outline-primary">Переглянути відповіді</a>
+                }
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary" disabled> Почати тест </button>
+                <span>Увійдіть у систему, щоб пройти тест.</span>
+            }
+
+
+            @if (User?.Identity != null && User.Identity.Name == Model.Teacher.UserName)
+            {
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+                    style="display: inline"
+                    onsubmit="return confirm('Ви впевнені, що хочете видалити цей тест? Це також видалить усі результати учнів.');">
+                    <button type="submit" class="btn btn-danger">Видалити тест</button>
+                </form>
+            }
+
+            <a asp-action="Index" class="btn btn-secondary ms-2">Назад</a>
+        </div>
+    </div>
+</div>

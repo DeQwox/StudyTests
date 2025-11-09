@@ -1,4 +1,4 @@
-@model StudyTests.Models.DTO.TestCreateViewModel
+@model StudyTests.Models.DTO.Tests.TestCreateViewModel
 @{
     ViewData["Title"] = "Створити тест";
 }
@@ -6,6 +6,7 @@
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="AddTest" method="post">
+
     <div class="mb-3">
         <label asp-for="Name" class="form-label">Назва</label>
         <input asp-for="Name" class="form-control" />
@@ -14,36 +15,27 @@
     <div class="mb-3">
         <label asp-for="Description" class="form-label">Опис</label>
         <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Password" class="form-label">Пароль доступу</label>
         <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="ValidUntil" class="form-label">Дійсний до</label>
         <input asp-for="ValidUntil" class="form-control" type="datetime-local" id="ValidUntil" />
         <span asp-validation-for="ValidUntil" class="text-danger"></span>
+        <span asp-validation-for="ValidUntil" class="text-danger"></span>
     </div>
-    <div class="mb-3">
-        <label asp-for="TeacherId" class="form-label">Вчитель</label>
-        <select asp-for="TeacherId" class="form-select">
-            <option value="">Оберіть вчителя</option>
-            @if (ViewBag.Teachers != null)
-            {
-                foreach (var t in (IEnumerable<StudyTests.Models.Entities.Teacher>)ViewBag.Teachers)
-                {
-                    <option value="@t.Id">@t.FullName (@t.Login)</option>
-                }
-            }
-        </select>
-    </div>
+    
 
     <h4>Питання</h4>
     <div id="questions"></div>
     <button type="button" id="addQuestion" class="btn btn-secondary mb-3">Додати питання</button>
 
     <input type="hidden" id="QuestionsJson" name="QuestionsJson" />
-
+    <br />
     <button type="submit" class="btn btn-primary">Створити тест</button>
 </form>
 
@@ -86,8 +78,11 @@
             <input class="form-control q-score" type="number" step="0.1" value="1" />
         </div>
     <div class="mb-2 answers">
-      <label>Варіанти відповіді (виділіть правильну)</label>
-      <div><input class="form-control a-text" /> <input type="radio" name="correct_${qIndex}" class="a-correct" /></div>
+        <label>Варіанти відповіді (виділіть правильну)</label>
+        <div class="d-flex align-items-center gap-2 mt-1">
+            <input type="radio" name="correct_${qIndex}" class="form-check-input a-correct" />
+            <input class="form-control a-text" placeholder="Введіть відповідь" />
+        </div>
     </div>
     <button type="button" class="btn btn-sm btn-secondary add-answer">Додати варіант</button>
     <button type="button" class="btn btn-sm btn-danger remove-question">Видалити питання</button>
@@ -100,7 +95,7 @@
             $('#questions').on('click', '.add-answer', function(){
                 const container = $(this).closest('.card').find('.answers');
                 const qidx = $(this).closest('.card').data('index');
-                container.append(`<div><input class="form-control a-text" /> <input type="radio" name="correct_${qidx}" class="a-correct" /></div>`);
+                container.append(`<div class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="correct_${qidx}" class="form-check-input a-correct" /> <input class="form-control a-text" placeholder="Введіть відповідь" /></div>`);
             });
 
             $('#questions').on('click', '.remove-question', function(){
@@ -113,7 +108,7 @@
                     const qText = $(this).find('.q-text').val();
                     const scoreVal = parseFloat($(this).find('.q-score').val()) || 0;
                     const answers = [];
-                    let correctIndex = 0;
+                    let correctIndex = -1;
                     $(this).find('.answers div').each(function(ai){
                         answers.push($(this).find('.a-text').val());
                         if ($(this).find('.a-correct').is(':checked')) correctIndex = ai;

@@ -16,6 +16,8 @@ using StudyTests.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSession();
+
 // Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
@@ -149,6 +151,8 @@ foreach (var conn in connSection.GetChildren())
         tmpLoggerFactory.CreateLogger("Program").LogWarning(ex, "Could not set PRAGMA for connection '{ConnName}'. Continuing.", conn.Key);
     }
 }
+
+app.UseSession();
 
 // Create roles
 using (var scope = app.Services.CreateScope())
