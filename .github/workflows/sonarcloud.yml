@@ -3,10 +3,10 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - lab6Artem          # ← тільки ця гілка (зміни на свою, якщо треба)
+      - lab6Artem          
   pull_request:
     branches:
-      - lab6Artem          # ← і тільки PR у цю гілку
+      - lab6Artem          
 
 jobs:
   sonarcloud:
@@ -20,7 +20,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x   # зміни, якщо в тебе інша версія
+          dotnet-version: 9.0.x   
 
       - name: Restore dependencies
         run: dotnet restore
