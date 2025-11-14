@@ -3,32 +3,41 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - lab6Artem          
+      - lab6Artem
   pull_request:
     branches:
-      - lab6Artem          
+      - lab6Artem
 
 jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0    # обов’язково для точного аналізу гілок та PR
 
-      - name: Setup .NET
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x   
+          dotnet-version: 9.0.x
 
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
+      - name: Build project
         run: dotnet build --no-restore -c Release
+
+      # Опціонально: якщо в тебе є юніт-тести і ти хочеш бачити покриття коду
+      # - name: Run tests with coverage
+      #   run: dotnet test --no-build -c Release --collect:"XPlat Code Coverage"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # Якщо автоматично не підтягується projectKey та organization — розкоментуй:
+        # with:
+        #   projectKey: твій_project_key
+        #   organization: твоя_організація
