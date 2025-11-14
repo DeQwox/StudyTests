@@ -34,3 +34,5 @@ jobs:
             -Dsonar.projectKey=DeQwox_StudyTests
             -Dsonar.organization=deqwox
             -Dsonar.host.url=https://sonarcloud.io
+
+# To ignore: The commit message above is for demonstration purposes only.
