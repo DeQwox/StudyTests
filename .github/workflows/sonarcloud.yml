@@ -1,4 +1,3 @@
-# .github/workflows/sonarcloud.yml
 name: SonarCloud Analysis
 
 on:
@@ -27,7 +26,11 @@ jobs:
           dotnet build --no-restore -c Release
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@master   # ← ОНОВЛЕНИЙ ОФІЦІЙНИЙ ЕКШН
+        uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.projectKey=DeQwox_StudyTests
+            -Dsonar.organization=deqwox
+            -Dsonar.host.url=https://sonarcloud.io
