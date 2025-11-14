@@ -1,53 +1,32 @@
-name: SonarCloud
+name: SonarCloud Analysis
 
 on:
-	push:
-		branches: [ lab6Artem ]
-	pull_request:
-		types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [ lab6Artem ]   # додав усі можливі гілки
+  pull_request:
+    types: [ opened, synchronize, reopened ]
 
 jobs:
-	build:
-		name: Build, Test and Analyze on SonarCloud
-		runs-on: ubuntu-latest
-		steps:
-			- name: Checkout
-				uses: actions/checkout@v4
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-			- name: Setup .NET
-				uses: actions/setup-dotnet@v3
-				with:
-					dotnet-version: '9.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x   # якщо в тебе 6.0 або 7.0 — зміни тут
 
-			- name: Install dotnet-sonarscanner
-				run: dotnet tool install --global dotnet-sonarscanner || true
+      - name: Restore dependencies
+        run: dotnet restore
 
-			- name: Restore
-				run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore -c Release
 
-			- name: Begin SonarCloud analysis
-				env:
-					SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-				run: |
-					dotnet sonarscanner begin \
-						/k:"${{ secrets.SONAR_PROJECT_KEY }}" \
-						/o:"${{ secrets.SONAR_ORGANIZATION }}" \
-						/d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
-			- name: Build
-				run: dotnet build --no-restore --configuration Release
-
-			- name: Run tests
-				run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=TestResults.trx" || true
-
-			- name: End SonarCloud analysis
-				env:
-					SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-				run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
-# Notes:
-# - Create the following GitHub repository secrets: SONAR_TOKEN, SONAR_ORGANIZATION, SONAR_PROJECT_KEY
-#   * SONAR_TOKEN: token from your SonarCloud account (generate under My Account -> Security).
-#   * SONAR_ORGANIZATION: your SonarCloud organization key (found in SonarCloud settings).
-#   * SONAR_PROJECT_KEY: a unique key for this project (e.g. DeQwox_StudyTests).
-# - Adjust branches under `on.push` if your default branch is different.
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
