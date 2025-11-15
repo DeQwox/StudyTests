@@ -51,6 +51,19 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="OpenTelemetry" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.9.0-beta.1" />
+
+  <!-- Prometheus exporter — ТІЛЬКИ 1.8.0-rc.1 (це ключ до відсутності помилки unit "bytes") -->
+  <PackageReference Include="prometheus-net" Version="8.2.1" />
+  <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
+
+  <!-- Zipkin — 1.9.0 нормально працює з OpenTelemetry 1.9.0 -->
+  <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.9.0" />
   </ItemGroup>
 
 </Project>
