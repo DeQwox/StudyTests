@@ -132,11 +132,19 @@ app.UseSession();
 // Create roles
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    await SeedRolesAsync(roleManager);
-    await SeedInitialUsersAsync(userManager, roleManager);
+    var services = scope.ServiceProvider;
+    try
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        await SeedRolesAsync(roleManager);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error seeding roles");
+    }
 }
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -208,8 +216,17 @@ app.UseHttpMetrics();                     // збирає HTTP-метрики
 
 app.Run();
 
-// Твої Seed-методи (залиш як є)
-static async Task SeedRolesAsync(RoleManager<IdentityRole<int>> roleManager) { /* твій код */ }
-static async Task SeedInitialUsersAsync(UserManager<User> userManager, RoleManager<IdentityRole<int>> roleManager) { /* твій код */ }
-//docker-compose up -d
 
+
+static async Task SeedRolesAsync(RoleManager<IdentityRole<int>> roleManager)
+{
+    string[] roleNames = ["Student", "Teacher"];
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            var role = new IdentityRole<int> { Name = roleName, NormalizedName = roleName.ToUpper() };
+            await roleManager.CreateAsync(role);
+        }
+    }
+}
