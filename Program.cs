@@ -167,3 +167,44 @@ app.Run();
 static async Task SeedRolesAsync(RoleManager<IdentityRole<int>> roleManager) { /* твій код */ }
 static async Task SeedInitialUsersAsync(UserManager<User> userManager, RoleManager<IdentityRole<int>> roleManager) { /* твій код */ }
 //docker-compose up -d
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var repo = scope.ServiceProvider.GetRequiredService<ITestingRepository>();
+
+    var existing = await repo.GetAllTestsAsync();
+    if (!existing.Any())
+    {
+        Console.WriteLine("Seeding tests...");
+
+        for (int i = 1; i <= 10000; i++)
+        {
+            var model = new StudyTests.Models.DTO.Tests.TestCreateViewModel
+            {
+                Name = $"Test #{i}",
+                Description = $"Test description {i}",
+                Password = "pass",
+                ValidUntil = DateTime.UtcNow.AddYears(1),
+                TeacherId = 1, // must exist in DB
+                Questions =
+                [
+                    new Question
+                    {
+                        Description = "Q1",
+                        Answers = ["A", "B", "C", "D"],
+                        CorrectAnswerIndex = 0,
+                        Score = 5
+                    }
+                ]
+            };
+
+            await repo.AddTestAsync(model);
+
+            if (i % 500 == 0)
+                Console.WriteLine($"Seeded {i} tests...");
+        }
+
+        Console.WriteLine("Seeding complete.");
+    }
+}
