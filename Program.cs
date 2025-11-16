@@ -189,7 +189,7 @@ app.UseHttpMetrics();                     // збирає HTTP-метрики
 //                 Description = $"Test description {i}",
 //                 Password = "pass",
 //                 ValidUntil = DateTime.UtcNow.AddYears(1),
-//                 TeacherId = 1, // must exist in DB
+//                 TeacherId = 3, // must exist in DB
 //                 Questions =
 //                 [
 //                     new Question
