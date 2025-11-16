@@ -15,6 +15,7 @@ using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 builder.Services.AddSession();
 
 // Services
@@ -103,6 +104,21 @@ builder.Services.AddOpenTelemetry()
         .AddAspNetCoreInstrumentation()
         .AddRuntimeInstrumentation()
     );
+
+
+
+var env = builder.Environment;
+
+if (env.IsEnvironment("LoadTest"))
+{
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = null;
+        options.DefaultChallengeScheme = null;
+    });
+}
+
+
 var app = builder.Build();
 
 // SQLite PRAGMA
