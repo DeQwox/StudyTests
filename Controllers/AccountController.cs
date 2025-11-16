@@ -104,7 +104,7 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
     }
 
     [HttpGet]
-    public async Task<IActionResult> ExternalLoginCallback()
+    public IActionResult ExternalLoginCallback()
     {
         if (User.Identity?.IsAuthenticated == true)
             return RedirectToAction("Profile");

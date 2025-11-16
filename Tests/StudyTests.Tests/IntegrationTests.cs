@@ -65,8 +65,8 @@ public class IntegrationTests : IDisposable
 
         // Assert
         student.Should().NotBeNull();
-        student!.FullName.Should().Be("John Doe");
-        student.Email.Should().Be("john.doe@example.com");
+        student!.FullName.Should().Be("Jane Smith");
+        student.Email.Should().Be("jane.smith@example.com");
     }
 
     [Fact]

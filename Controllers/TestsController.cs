@@ -68,7 +68,7 @@ public class TestsController(ITestingRepository repo, UserManager<User> userMana
     [HttpGet]
     [Route("Create")]
     [Authorize(Roles = "Teacher")]
-    public async Task<IActionResult> Create()
+    public IActionResult Create()
     {
         return View(new TestCreateViewModel());
     }

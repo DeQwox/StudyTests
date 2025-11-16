@@ -9,10 +9,10 @@ namespace StudyTests.Services;
 public class Testing
 {
     [JsonIgnore]
-    private ITestingRepository _testingRepository;
+    private ITestingRepository? _testingRepository;
 
     [JsonIgnore]
-    private Test _test;
+    private Test? _test;
 
     [JsonIgnore]
     public List<Question> Questions { get; set; } = [];
@@ -62,7 +62,7 @@ public class Testing
     {
         return new PassedTest()
         {
-            Student = await _testingRepository.GetStudentByIdAsync(StudentId) ?? throw new Exception("Student doesn't exist"),
+            Student = await _testingRepository!.GetStudentByIdAsync(StudentId) ?? throw new Exception("Student doesn't exist"),
             Test    = await _testingRepository.GetTestByIdAsync(TestId) ?? throw new Exception("Test doesn't exist"),
             Answers = Answers.Select(i => i.ToString()).ToList(),
             Score = Questions.Zip(Answers)
