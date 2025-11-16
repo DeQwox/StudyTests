@@ -15,6 +15,9 @@ using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSession();
+
+// Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
 
@@ -116,10 +119,17 @@ foreach (var conn in connSection.GetChildren())
         cmd.CommandText = "PRAGMA journal_mode=WAL; PRAGMA busy_timeout = 5000;";
         await cmd.ExecuteNonQueryAsync();
     }
-    catch { }
+    catch (Exception ex)
+    {
+        // Log but don't fail startup if PRAGMA can't be set (e.g., running on non-file-based provider or unsupported keywords)
+        var tmpLoggerFactory = LoggerFactory.Create(l => l.AddConsole());
+        tmpLoggerFactory.CreateLogger("Program").LogWarning(ex, "Could not set PRAGMA for connection '{ConnName}'. Continuing.", conn.Key);
+    }
 }
 
-// Seed
+app.UseSession();
+
+// Create roles
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();

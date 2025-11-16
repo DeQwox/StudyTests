@@ -1,0 +1,11 @@
+@model StudyTests.Models.Entities.PassedTest
+
+<h2>Результат тесту: @Model.Test.Name</h2>
+
+<p>Бал: @Model.Score</p>
+<p>Дата: @Model.PassedAt.ToLocalTime()</p>
+
+
+
+
+<a asp-controller="Tests" asp-action="Index" class="btn btn-secondary">Назад до тестів</a>

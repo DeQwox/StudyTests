@@ -1,4 +1,5 @@
 using System.Data;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Repositories;
 using StudyTests.Models.Entities;
@@ -7,57 +8,73 @@ namespace StudyTests.Services;
 
 public class Testing
 {
-    private readonly ITestingRepository _testingRepository;
-    private Test _test;
-    private int[] _order = [];
-    private int _current = 0;
-    private List<Question> _questions = [];
-    private int[] _answers = [];
+    [JsonIgnore]
+    private ITestingRepository _testingRepository;
 
-    private int _studentId;
-    private int _testId;
+    [JsonIgnore]
+    private Test _test;
+
+    [JsonIgnore]
+    public List<Question> Questions { get; set; } = [];
+    
+    public int[] Order { get; set; } = [];
+    public int Current { get; set; }
+    public int[] Answers { get; set; } = [];
+
+    public int StudentId { get; set; }
+    public int TestId { get; set; }
+
+    public Testing() { }
 
     public Testing(int testId, int studentId, ITestingRepository testingRepository)
     {
-        _testId = testId;
-        _studentId = studentId;
+        TestId = testId;
+        Console.WriteLine($"Test id: {TestId}");
+        StudentId = studentId;
 
         _testingRepository = testingRepository;
         _test = _testingRepository.GetTestById(testId) ?? throw new Exception("Test doesn't exist");
 
-        _questions = _testingRepository.GetTestQuestionList(testId).ToList();
-        _order = Enumerable.Range(0, _questions.Count).ToArray();
-        new Random().Shuffle(_order);
+        Questions = _testingRepository.GetTestQuestionList(testId).ToList();
+        Order = Enumerable.Range(0, Questions.Count).ToArray();
+        new Random().Shuffle(Order);
         
         
-        _answers = new int[_questions.Count];
+        Answers = new int[Questions.Count];
     }
 
     public int GetQuestionsCount()
     {
-        return _questions.Count;
+        return Questions.Count;
     }
 
     public Question GetQuestion()
     {
-        return _questions[_order[_current++]];
+        return Questions[Order[Current++]];
     }
 
     public void Answer(int answer)
     {
-        _answers[_order[_current - 1]] = answer;
+        Answers[Order[Current - 1]] = answer;
     }
     
     public async Task<PassedTest> GetResult()
     {
         return new PassedTest()
         {
-            Student = await _testingRepository.GetStudentByIdAsync(_studentId) ?? throw new Exception("Student doesn't exist"),
-            Test    = await _testingRepository.GetTestByIdAsync(_testId) ?? throw new Exception("Test doesn't exist"),
-            Answers = _answers.Select(i => i.ToString()).ToList(),
-            Score = _questions.Zip(_answers)
+            Student = await _testingRepository.GetStudentByIdAsync(StudentId) ?? throw new Exception("Student doesn't exist"),
+            Test    = await _testingRepository.GetTestByIdAsync(TestId) ?? throw new Exception("Test doesn't exist"),
+            Answers = Answers.Select(i => i.ToString()).ToList(),
+            Score = Questions.Zip(Answers)
                         .Select(i => (i.First.CorrectAnswerIndex == i.Second) ? i.First.Score : 0)
                         .Sum()
         };
+    }
+
+    public void RestoreDependencies(ITestingRepository testingRepository)
+    {
+        _testingRepository = testingRepository;
+        _test = _testingRepository.GetTestById(TestId) ?? throw new Exception("Test doesn't exist");
+        Questions = _testingRepository.GetTestQuestionList(TestId).ToList();
     }
 }

@@ -1,0 +1,65 @@
+@using StudyTests.Models.DTO.Tests
+@model IEnumerable<TestViewModel>
+@{
+    ViewData["Title"] = "Список тестів";
+}
+
+<div class="container">
+    <h2 class="mb-4">Список тестів</h2>
+
+    @if (!Model.Any())
+    {
+        <p>Тести ще не створені.</p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                var test = item.Test;
+                var passed = item.Passed;
+                var maxScore = test.Questions?.Sum(q => q.Score) ?? 0;
+
+                <div class="col-12 col-md-6 mb-3">
+                    <a asp-controller="Tests" asp-action="Details" asp-route-id="@test.Id"
+                       class="text-decoration-none text-reset">
+                        <div class="card shadow-sm h-100 position-relative hover-shadow"
+                             style="cursor: pointer; transition: transform .1s ease-in-out;"
+                             onmouseover="this.style.transform='scale(1.02)'"
+                             onmouseout="this.style.transform='scale(1)'">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">@test.Name</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">Вчитель: @test.Teacher.FullName</h6>
+                                    </div>
+                                    @if (passed != null)
+                                    {
+                                        <span class="badge bg-success">Пройдено</span>
+                                    }
+                                </div>
+
+                                <p class="card-text mt-2">
+                                    @(test.Description.Length > 200 ? test.Description.Substring(0, 200) + "..." : test.Description)
+                                </p>
+
+                                <p class="card-text">
+                                    @if (passed != null)
+                                    {
+                                        <strong>Результат:</strong>
+                                        @($" {passed.Score} / {maxScore}")
+                                    }
+                                    else
+                                    {
+                                        <strong>Оцінюється на:</strong>
+                                        @($" {maxScore}")
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
