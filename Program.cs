@@ -172,6 +172,7 @@ app.UseHttpMetrics();                     // збирає HTTP-метрики
 
 
 
+
 // using (var scope = app.Services.CreateScope())
 // {
 //     var repo = scope.ServiceProvider.GetRequiredService<ITestingRepository>();
