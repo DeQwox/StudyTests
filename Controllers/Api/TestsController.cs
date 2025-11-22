@@ -111,4 +111,16 @@ public class TestsController(ITestingRepository repo) : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("last10")]
+    public async Task<IActionResult> GetLast10(string userId)
+    {
+        var scores = (await _repo.GePassedTestsAsync())
+            .Where(t => t.StudentId.ToString() == userId)
+            .OrderByDescending(t => t.PassedAt)
+            .Take(10)
+            .Select(t => new { t.Score, t.PassedAt })
+            .ToList();
+        return Ok(scores);
+    }
 }

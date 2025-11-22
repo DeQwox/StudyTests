@@ -13,7 +13,7 @@ public static class Config
 
     public static IEnumerable<ApiScope> ApiScopes =>
         [
-            new ApiScope("app_api", "App API")
+            new ApiScope("app_api", "App API"),
         ];
 
     public static IEnumerable<Client> Clients =>
