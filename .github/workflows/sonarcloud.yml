@@ -1,0 +1,38 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [ lab6Artem ]
+  pull_request:
+    branches: [ lab6Artem ]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore & Build
+        run: |
+          dotnet restore
+          dotnet build --no-restore -c Release
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=DeQwox_StudyTests
+            -Dsonar.organization=deqwox
+            -Dsonar.host.url=https://sonarcloud.io
+
+# To ignore: The commit message above is for demonstration purposes only.

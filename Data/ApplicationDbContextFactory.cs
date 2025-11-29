@@ -2,7 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
+<<<<<<< HEAD
 namespace Data;
+=======
+namespace StudyTests.Data;
+>>>>>>> origin/lab6Artem
 
 public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {

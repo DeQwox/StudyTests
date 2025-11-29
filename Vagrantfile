@@ -25,16 +25,26 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
     end
   end
+<<<<<<< HEAD
 # Windows VM configuration
+=======
+
+  # Windows VM configuration
+>>>>>>> origin/lab6Artem
   config.vm.define "windows" do |windows|
     windows.vm.box = "gusztavvargadr/windows-11"
     windows.vm.hostname = "windows-vm"
     windows.vm.network "private_network", type: "dhcp"
 
+<<<<<<< HEAD
     # We explicitly tell Vagrant this is a PowerShell script
     windows.vm.provision "shell", inline: <<-SHELL
       $ErrorActionPreference = "Stop"
 
+=======
+    
+    windows.vm.provision "shell", inline: <<-SHELL
+>>>>>>> origin/lab6Artem
       Write-Host "=== Downloading .NET SDK installer ==="
       $dotnetUrl = "https://builds.dotnet.microsoft.com/dotnet/Sdk/9.0.305/dotnet-sdk-9.0.305-win-x64.exe"
       $dotnetInstaller = "C:\\dotnet-sdk.exe"
@@ -43,6 +53,7 @@ Vagrant.configure("2") do |config|
       Write-Host "=== Installing .NET SDK ==="
       Start-Process -FilePath $dotnetInstaller -ArgumentList "/quiet" -Wait
       
+<<<<<<< HEAD
       # Update the PATH for the CURRENT session so the next commands work
       Write-Host "=== Updating PATH ==="
       $env:PATH = "$env:PATH;C:\Program Files\dotnet"
@@ -61,6 +72,18 @@ Vagrant.configure("2") do |config|
       
       dotnet restore
       dotnet build
+=======
+      powershell -Command "$env:PATH += ';C:\Program Files\dotnet'"
+  
+      powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/DeQwox/StudyTests/main/StudyTests.zip' -OutFile 'C:\\Users\\vagrant\\StudyTests.zip'"
+      powershell -Command "Expand-Archive -Path 'C:\\Users\\vagrant\\StudyTests.zip' -DestinationPath 'C:\\Users\\vagrant\\StudyTests' -Force"
+      powershell -Command "Remove-Item 'C:\\Users\\vagrant\\StudyTests.zip'"
+
+      powershell -Command "cd C:\\Users\\vagrant\\StudyTests\\Tests\\StudyTests.Tests; dotnet add package xunit --version 2.9.2"
+      powershell -Command "cd C:\\Users\\vagrant\\StudyTests\\Tests\\StudyTests.Tests; dotnet add package xunit.runner.visualstudio --version 2.9.2"
+      powershell -Command "cd C:\\Users\\vagrant\\StudyTests\\Tests\\StudyTests.Tests; dotnet restore"
+      powershell -Command "cd C:\\Users\\vagrant\\StudyTests\\Tests\\StudyTests.Tests; dotnet build"
+>>>>>>> origin/lab6Artem
     SHELL
 
     windows.vm.provider "virtualbox" do |vb|

@@ -13,12 +13,16 @@ public class Test : Entity
     public string Name { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ValidUntil { get; set; }
+    
     [MaxLength(200)]
-    [Required]
-    public string Password { get; set; } = string.Empty;
+    public string? Password { get; set; }
 
     [ForeignKey(nameof(TeacherID))]
+<<<<<<< HEAD
     public Teacher Teacher { get; set; } = null!;
+=======
+    public User Teacher { get; set; } = null!;
+>>>>>>> origin/lab6Artem
 
     public ICollection<Question> Questions { get; set; }  = [];
 }
