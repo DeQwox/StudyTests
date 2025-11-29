@@ -12,15 +12,37 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using Prometheus;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddSession();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200") // Ensure this matches your Angular port
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("StudyTests")
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "Keys")));
 
 // Services
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? "Data Source=StudyTests.db";
@@ -82,28 +104,28 @@ builder.Services.AddScoped<StudyTests.Services.Api.IPassedTestsService, StudyTes
 builder.Services.AddScoped<StudyTests.Services.Api.IUsersService, StudyTests.Services.Api.UsersService>();
 
 // === OpenTelemetry — стабільна і робоча конфігурація ===
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("StudyTests-Service"))
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddSqlClientInstrumentation(options =>
-        {
-            options.SetDbStatementForText = true;                    // ← показує текст SQL
-            options.RecordException = true;
-        })
-        .AddSource("StudyTests.Api")                                 // ← для твоїх ActivitySource
-        .AddSource("Microsoft.Data.Sqlite")                          // ← ГОЛОВНЕ! Для Sqlite!
-        .AddZipkinExporter(o => 
-        {
-            o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
-        })
-    )
-    .WithMetrics(metrics => metrics
-        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("StudyTests-Service"))
-        .AddAspNetCoreInstrumentation()
-        .AddRuntimeInstrumentation()
-    );
+// builder.Services.AddOpenTelemetry()
+//     .WithTracing(tracing => tracing
+//         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("StudyTests-Service"))
+//         .AddAspNetCoreInstrumentation()
+//         .AddHttpClientInstrumentation()
+//         .AddSqlClientInstrumentation(options =>
+//         {
+//             options.SetDbStatementForText = true;                    // ← показує текст SQL
+//             options.RecordException = true;
+//         })
+//         .AddSource("StudyTests.Api")                                 // ← для твоїх ActivitySource
+//         .AddSource("Microsoft.Data.Sqlite")                          // ← ГОЛОВНЕ! Для Sqlite!
+//         .AddZipkinExporter(o => 
+//         {
+//             o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
+//         })
+//     )
+//     .WithMetrics(metrics => metrics
+//         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("StudyTests-Service"))
+//         .AddAspNetCoreInstrumentation()
+//         .AddRuntimeInstrumentation()
+//     );
 
 
 
@@ -171,8 +193,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.WebRootPath, "app", "browser")),
+    RequestPath = "/app"
+});
+
 app.UseAntiforgery();
+
 app.UseRouting();
+
+app.UseCors("AllowAngular");
+
 app.UseAuthentication();
 app.UseIdentityServer();
 app.UseAuthorization();
@@ -180,6 +212,9 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapFallbackToFile("/app/{*path}", "app/browser/index.html");
+app.MapFallbackToFile("/app/{**slug:nonfile}", "app/browser/index.html");
 
 /* === ГОЛОВНЕ: метрики на HTTP 5000 — працює завжди === */
 app.UseMetricServer("/metrics");                    // додає /metrics
@@ -228,7 +263,6 @@ app.UseHttpMetrics();                     // збирає HTTP-метрики
 //         Console.WriteLine("Seeding complete.");
 //     }
 // }
-
 
 
 app.Run();
