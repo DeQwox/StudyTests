@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <h2>Створити тест</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    
+    <div class="mb-3">
+      <label class="form-label">Назва</label>
+      <input formControlName="name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Опис</label>
+      <textarea formControlName="description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Пароль доступу</label> <input formControlName="password" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Дійсний до</label>
+      <input type="datetime-local" formControlName="validUntil" [min]="minDate" class="form-control" />
+      <div *ngIf="form.get('validUntil')?.errors?.['pastDate']" class="text-danger">
+        Обрана дата і час мають бути в майбутньому. </div>
+    </div>
+
+    <h4>Питання</h4>
+    
+    <div formArrayName="questions">
+      <div *ngFor="let q of questions.controls; let i=index" [formGroupName]="i" class="card mb-2">
+        <div class="card-body">
+          <div class="mb-2">
+            <label>Питання</label>
+            <input formControlName="description" class="form-control" /> </div>
+          <div class="mb-2">
+            <label>Бали за питання</label>
+            <input type="number" formControlName="score" step="0.1" class="form-control" />
+          </div>
+
+          <div class="mb-2">
+            <label>Варіанти відповіді (виділіть правильну)</label> <div formArrayName="answers">
+              <div *ngFor="let a of getAnswers(i).controls; let j=index" [formGroupName]="j" class="d-flex align-items-center gap-2 mt-1">
+                <input type="radio" [name]="'correct_' + i" [value]="j" 
+                       (change)="q.get('correctAnswerIndex')?.setValue(j)"
+                       [checked]="q.get('correctAnswerIndex')?.value === j"
+                       class="form-check-input" />
+                <input formControlName="text" class="form-control" placeholder="Введіть відповідь" />
+              </div>
+            </div>
+          </div>
+
+          <button type="button" (click)="addAnswer(i)" class="btn btn-sm btn-secondary me-2">Додати варіант</button>
+          <button type="button" (click)="removeQuestion(i)" class="btn btn-sm btn-danger">Видалити питання</button> </div>
+      </div>
+    </div>
+
+    <button type="button" (click)="addQuestion()" class="btn btn-secondary mb-3">Додати питання</button> <br />
+    <button type="submit" [disabled]="form.invalid" class="btn btn-primary">Створити тест</button>
+  </form>
+</div>

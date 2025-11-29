@@ -1,0 +1,49 @@
+<div class="container mt-4">
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && test">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h3 class="card-title">{{ test.name }}</h3>
+          
+          <span *ngIf="test.passed" class="badge bg-success fs-6">Пройдено</span>
+          <span *ngIf="!test.passed" class="badge bg-secondary fs-6">Не пройдено</span>
+        </div>
+  
+        <h6 class="text-muted">Вчитель: {{ test.teacherName }}</h6>
+        <p class="mt-3">{{ test.description }}</p>
+  
+        <p class="mb-1"><strong>Кількість запитань:</strong> {{ test.questionCount }}</p> 
+        
+        <div *ngIf="test.passed">
+          <p><strong>Ваш результат:</strong> {{ test.passed.score }} / {{ test.maxScore }}</p>
+          <p class="text-muted">Дата проходження: {{ test.passed.passedAt | date:'dd.MM.yyyy HH:mm' }}</p>
+        </div>
+        
+        <div *ngIf="!test.passed">
+          <p><strong>Максимальний бал:</strong> {{ test.maxScore }}</p>
+        </div>
+  
+        <hr />
+  
+        <div class="mb-3">
+          <a *ngIf="!test.passed" href="/Testing/Question" class="btn btn-primary me-2">Почати тест</a>
+          <a *ngIf="test.passed" href="/Testing/Results" class="btn btn-outline-primary me-2">Переглянути відповіді</a>
+          
+          <button *ngIf="test.isOwner" (click)="deleteTest()" class="btn btn-danger">Видалити тест</button>
+        </div>
+        
+        <a routerLink="/tests" class="btn btn-secondary">Назад</a>
+      </div>
+    </div>
+  </div>
+</div>
