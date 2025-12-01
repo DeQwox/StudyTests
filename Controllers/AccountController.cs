@@ -9,13 +9,46 @@ using BCrypt;
 using Microsoft.AspNetCore.Identity;
 using Duende.IdentityServer;
 
-namespace StudyTests.Controllers;
-
-public class AccountController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager) : Controller
+namespace StudyTests.Controllers
 {
-    private readonly ApplicationDbContext _context = context;
-    private readonly UserManager<User> _userManager = userManager;
-    private readonly SignInManager<User> _signInManager = signInManager;
+    public class AccountController : Controller
+    {
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
+
+    public AccountController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
+    {
+        _context = context;
+        _userManager = userManager;
+        _signInManager = signInManager;
+    }
+
+    // POST /api/account/register - API registration endpoint
+    [HttpPost]
+    [Route("api/account/register")]
+    [Produces("application/json")]
+    public async Task<IActionResult> RegisterApi([FromBody] RegisterApiDto model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var user = new User
+        {
+            UserName = model.Login,
+            Email = model.Email,
+            PhoneNumber = model.PhoneNumber,
+            FullName = model.FullName ?? string.Empty,
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, model.Role);
+            return Ok(new { success = true, userId = user.Id });
+        }
+        return BadRequest(new { success = false, errors = result.Errors.Select(e => e.Description).ToList() });
+    }
 
     [HttpGet]
     public IActionResult Register() => View();
@@ -109,10 +142,6 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
         return RedirectToAction("Index", "Home");
     }
 
-
-
-
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAccount()
@@ -136,4 +165,5 @@ public class AccountController(ApplicationDbContext context, UserManager<User> u
 
         return View("Index");
     }
+}
 }

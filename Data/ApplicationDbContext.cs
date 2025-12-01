@@ -28,6 +28,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasConversion(answersConverter)
             .HasColumnType("TEXT");
 
+        modelBuilder.Entity<PassedTest>()
+            .Property(p => p.Answers)
+            .HasConversion(answersConverter)
+            .HasColumnType("TEXT");
+
         // Ensure Questions collection is initialized when creating Test/Question relationships
         modelBuilder.Entity<Test>()
             .HasMany(t => t.Questions)

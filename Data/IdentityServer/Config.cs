@@ -29,6 +29,18 @@ public static class Config
                 PostLogoutRedirectUris = { "https://localhost:5001/signout-callback-oidc" },
                 AllowedScopes = { "openid", "profile", "email" },
                 AllowOfflineAccess = true
+            },
+            new Client
+            {
+                ClientId = "avalonia.client",
+                ClientName = "Avalonia Client",
+                AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                RequirePkce = true,
+                RequireClientSecret = false,
+                RedirectUris = { "studytests://callback" },
+                PostLogoutRedirectUris = { "studytests://callback" },
+                AllowedScopes = { "openid", "profile", "email", "app_api" },
+                AllowOfflineAccess = true
             }
         ];
 
